@@ -15,14 +15,17 @@ export default function Appointment(props) {
   const SAVING = "SAVING";
   const DELETING = "DELETING";
   const CONFIRM = "CONFIRM";
+  const EDIT = "EDIT";
 
   const { bookInterview, id, interviewers, interview, cancelInterview } = props;
   function save(name, interviewer) {
+    if (name && interviewer) {
+      transition(SAVING);
+    }
     const interview = {
       student: name,
       interviewer,
     };
-    transition(SAVING);
     Promise.resolve(bookInterview(id, interview))
       .then(() => transition(SHOW))
       .catch((err) => console.log(err));
@@ -47,14 +50,11 @@ export default function Appointment(props) {
           student={interview.student}
           interviewer={interview.interviewer}
           onDelete={deleteMessage}
+          onEdit={() => transition(EDIT)}
         />
       )}
       {mode === CREATE && (
-        <Form
-          interviewers={interviewers}
-          onCancel={() => back()}
-          onSave={save}
-        />
+        <Form interviewers={interviewers} onCancel={back} onSave={save} />
       )}
       {mode === SAVING && <Status message="Saving" />}
       {mode === DELETING && <Status message="Deleting" />}
@@ -63,6 +63,15 @@ export default function Appointment(props) {
           onCancel={back}
           onConfirm={deleteAppointment}
           message="Are you sure you would like to delete?"
+        />
+      )}
+      {mode === EDIT && (
+        <Form
+          student={interview.student}
+          interviewer={interview.interviewer.id}
+          interviewers={interviewers}
+          onCancel={back}
+          onSave={save}
         />
       )}
     </article>
