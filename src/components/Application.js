@@ -34,8 +34,7 @@ export default function Application(props) {
           ...state,
           appointments,
         });
-      })
-      .catch((e) => console.log(e));
+      });
   }
 
   const cancelInterview = (id) => {
@@ -49,8 +48,7 @@ export default function Application(props) {
     };
     return axios
       .delete(`/api/appointments/${id}`)
-      .then(() => setState({ ...state, appointments }))
-      .catch((err) => console.log(err));
+      .then(() => setState({ ...state, appointments }));
   };
   const [loading, setLoading] = useState(true);
   const appointments = getAppointmentsForDay(state, state.day);

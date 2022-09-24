@@ -7,6 +7,7 @@ import useVisualMode from "hooks/useVisualMode";
 import Form from "./Form";
 import Status from "./Status";
 import Confirm from "./Confirm";
+import Error from "./Error";
 
 export default function Appointment(props) {
   const EMPTY = "EMPTY";
@@ -16,6 +17,8 @@ export default function Appointment(props) {
   const DELETING = "DELETING";
   const CONFIRM = "CONFIRM";
   const EDIT = "EDIT";
+  const ERROR_SAVE = "ERROR_SAVE";
+  const ERROR_DELETE = "ERROR_DELETE";
 
   const { bookInterview, id, interviewers, interview, cancelInterview } = props;
   function save(name, interviewer) {
@@ -28,18 +31,22 @@ export default function Appointment(props) {
     };
     Promise.resolve(bookInterview(id, interview))
       .then(() => transition(SHOW))
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        transition(ERROR_SAVE, true);
+        console.log(err);
+      });
   }
   const { mode, transition, back } = useVisualMode(interview ? SHOW : EMPTY);
   const deleteAppointment = () => {
-    transition(DELETING);
+    transition(DELETING, true);
     Promise.resolve(cancelInterview(id))
       .then(() => transition(EMPTY))
-      .catch((e) => console.log(e));
+      .catch((e) => {
+        transition(ERROR_DELETE, true);
+        console.log(e);
+      });
   };
-  const deleteMessage = () => {
-    transition(CONFIRM);
-  };
+
   return (
     <article className="appointment">
       <Header time={props.time} />
@@ -49,7 +56,9 @@ export default function Appointment(props) {
           id={id}
           student={interview.student}
           interviewer={interview.interviewer}
-          onDelete={deleteMessage}
+          onDelete={() => {
+            transition(CONFIRM);
+          }}
           onEdit={() => transition(EDIT)}
         />
       )}
@@ -72,6 +81,18 @@ export default function Appointment(props) {
           interviewers={interviewers}
           onCancel={back}
           onSave={save}
+        />
+      )}
+      {mode === ERROR_SAVE && (
+        <Error
+          message="Could not save the appointment"
+          onClose={() => back()}
+        />
+      )}
+      {mode === ERROR_DELETE && (
+        <Error
+          message="Could not delete the appointment"
+          onClose={() => back()}
         />
       )}
     </article>
