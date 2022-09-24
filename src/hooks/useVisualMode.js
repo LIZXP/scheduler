@@ -14,12 +14,13 @@ export default function useVisualMode(initial) {
   function back() {
     if (history.length > 1) {
       setHistory((prev) => [...prev.slice(0, history.length - 1)]);
+      setMode(history[history.length - 2]);
     } else {
       return;
     }
   }
   return {
-    mode: history[history.length - 1],
+    mode,
     transition,
     back,
   };
