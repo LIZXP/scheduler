@@ -35,6 +35,5 @@ npm run storybook
 
 ## Database setup for the project
 
-```sh
 you can fork and clone the database [Here](https://github.com/LIZXP/scheduler-api).
-```
+
